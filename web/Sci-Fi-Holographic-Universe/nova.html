@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="An immersive sci-fi digital universe — holographic interfaces, cinematic particle simulations and abstract 3D environments." />
+  <title>NOVA — A Next-Gen Digital Universe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+  /* =====================================================================
+     NOVA/SYS — single-file build (CSS + JS inlined; double-click to run)
+     ===================================================================== */
+  :root {
+    --bg: #03040a; --bg-2: #06081a; --ink: #e8f0ff; --muted: #8ea0c8;
+    --cyan: #3df5ff; --violet: #9b5cff; --magenta: #ff4bd8; --amber: #ffd166;
+    --glass: rgba(120, 160, 255, 0.06); --glass-brd: rgba(140, 180, 255, 0.16);
+    --neon: linear-gradient(120deg, var(--cyan), var(--violet) 55%, var(--magenta));
+    --ease: cubic-bezier(0.16, 1, 0.3, 1); --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "Space Grotesk", system-ui, sans-serif;
+    background: radial-gradient(120% 120% at 50% -10%, var(--bg-2), var(--bg) 60%);
+    color: var(--ink); overflow-x: hidden; -webkit-font-smoothing: antialiased; cursor: none;
+  }
+  @media (pointer: coarse) { body { cursor: auto; } }
+  a { color: inherit; text-decoration: none; }
+  #scene { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; }
+  body.no-webgl {
+    background:
+      radial-gradient(60% 60% at 20% 20%, rgba(155,92,255,0.20), transparent 60%),
+      radial-gradient(50% 50% at 80% 30%, rgba(61,245,255,0.16), transparent 60%),
+      radial-gradient(70% 70% at 50% 100%, rgba(255,75,216,0.14), transparent 60%),
+      var(--bg);
+  }
+  .atmosphere { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+  .atmosphere__scan {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.015) 0 1px, transparent 1px 3px);
+    mix-blend-mode: overlay; opacity: 0.5; animation: scan 8s linear infinite;
+  }
+  @keyframes scan { to { transform: translateY(3px); } }
+  .atmosphere__vignette { position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(0,0,0,0.75)); }
+  .aura {
+    position: fixed; top: 0; left: 0; width: 26px; height: 26px;
+    border: 1px solid rgba(61,245,255,0.7); border-radius: 50%; transform: translate(-50%, -50%);
+    pointer-events: none; z-index: 999;
+    transition: width .25s var(--ease), height .25s var(--ease), background .25s var(--ease), border-color .25s var(--ease);
+    mix-blend-mode: screen; box-shadow: 0 0 22px rgba(61,245,255,0.5);
+  }
+  .aura.is-active { width: 64px; height: 64px; background: radial-gradient(circle, rgba(155,92,255,0.28), transparent 70%); border-color: rgba(155,92,255,0.8); }
+  @media (pointer: coarse) { .aura { display: none; } }
+  .hud { position: fixed; inset: 18px; z-index: 5; pointer-events: none; }
+  .hud__corner { position: absolute; width: 26px; height: 26px; opacity: 0.6; }
+  .hud__corner--tl { top: 0; left: 0; border-top: 1px solid var(--cyan); border-left: 1px solid var(--cyan); }
+  .hud__corner--tr { top: 0; right: 0; border-top: 1px solid var(--cyan); border-right: 1px solid var(--cyan); }
+  .hud__corner--bl { bottom: 0; left: 0; border-bottom: 1px solid var(--cyan); border-left: 1px solid var(--cyan); }
+  .hud__corner--br { bottom: 0; right: 0; border-bottom: 1px solid var(--cyan); border-right: 1px solid var(--cyan); }
+  .hud__readout { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); font-family: "Orbitron", monospace; font-size: 11px; letter-spacing: 3px; color: var(--muted); text-shadow: 0 0 10px rgba(61,245,255,0.4); }
+  .boot { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; background: radial-gradient(circle at 50% 50%, #05071a, #010208); transition: opacity .8s var(--ease), visibility .8s; }
+  .boot.is-done { opacity: 0; visibility: hidden; }
+  .boot__ring { position: absolute; width: 260px; height: 260px; border-radius: 50%; border: 1px solid rgba(61,245,255,0.25); border-top-color: var(--cyan); border-right-color: var(--violet); animation: spin 1.6s linear infinite; box-shadow: 0 0 60px rgba(61,245,255,0.25), inset 0 0 40px rgba(155,92,255,0.15); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .boot__label { text-align: center; z-index: 1; }
+  .boot__title { display: block; font-family: "Orbitron", sans-serif; font-weight: 900; font-size: 42px; letter-spacing: 10px; background: var(--neon); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 18px rgba(61,245,255,0.5)); }
+  .boot__sub { display: block; margin-top: 10px; font-size: 11px; letter-spacing: 5px; color: var(--muted); }
+  .boot__bar { margin: 18px auto 0; width: 200px; height: 2px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+  .boot__bar i { display: block; height: 100%; width: 0%; background: var(--neon); box-shadow: 0 0 12px var(--cyan); transition: width .2s linear; }
+  .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; padding: 22px clamp(20px, 5vw, 56px); transition: transform .5s var(--ease), background .5s var(--ease), backdrop-filter .5s; }
+  .nav.is-hidden { transform: translateY(-120%); }
+  .nav.is-scrolled { background: rgba(4,6,18,0.55); backdrop-filter: blur(14px); border-bottom: 1px solid var(--glass-brd); }
+  .nav__brand { display: flex; align-items: center; gap: 12px; font-family: "Orbitron"; font-weight: 700; letter-spacing: 3px; font-size: 15px; }
+  .nav__brand i { color: var(--cyan); font-style: normal; }
+  .nav__logo { width: 22px; height: 22px; border-radius: 6px; background: var(--neon); box-shadow: 0 0 18px rgba(61,245,255,0.6); animation: pulse 3s var(--ease-io) infinite; }
+  @keyframes pulse { 50% { transform: rotate(45deg) scale(0.85); border-radius: 40%; } }
+  .nav__links { display: flex; gap: 30px; }
+  .nav__links a { font-size: 13px; letter-spacing: 1px; color: var(--muted); position: relative; transition: color .3s; }
+  .nav__links a::after { content: ""; position: absolute; left: 0; bottom: -6px; width: 0; height: 1px; background: var(--neon); transition: width .35s var(--ease); }
+  .nav__links a:hover { color: var(--ink); }
+  .nav__links a:hover::after { width: 100%; }
+  .nav__cta { font-family: "Space Grotesk"; font-size: 13px; letter-spacing: 1px; padding: 10px 20px; border-radius: 40px; color: var(--ink); background: var(--glass); border: 1px solid var(--glass-brd); backdrop-filter: blur(8px); cursor: none; transition: box-shadow .4s, border-color .4s; }
+  .nav__cta:hover { box-shadow: 0 0 26px rgba(155,92,255,0.5); border-color: var(--violet); }
+  @media (max-width: 720px) { .nav__links { display: none; } }
+  main { position: relative; z-index: 4; }
+  .section { position: relative; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 120px clamp(20px, 6vw, 90px); }
+  .eyebrow { font-family: "Orbitron"; font-size: 11px; letter-spacing: 5px; color: var(--cyan); text-shadow: 0 0 12px rgba(61,245,255,0.5); }
+  .section__head { max-width: 640px; margin-bottom: 56px; }
+  .section__head h2 { font-size: clamp(30px, 5vw, 56px); font-weight: 700; margin: 16px 0 14px; line-height: 1.05; }
+  .section__head p { color: var(--muted); font-size: 17px; max-width: 520px; }
+  .section--hero { align-items: flex-start; }
+  .hero { max-width: 900px; will-change: transform; }
+  .hero__tag { display: inline-flex; align-items: center; gap: 10px; font-family: "Orbitron"; font-size: 11px; letter-spacing: 4px; color: var(--muted); padding: 9px 16px; border: 1px solid var(--glass-brd); border-radius: 40px; background: var(--glass); backdrop-filter: blur(6px); }
+  .hero__tag .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 12px var(--cyan); animation: blink 1.6s infinite; }
+  @keyframes blink { 50% { opacity: 0.25; } }
+  .hero__title { font-family: "Orbitron", sans-serif; font-weight: 900; font-size: clamp(46px, 10vw, 132px); line-height: 0.94; margin: 26px 0 22px; letter-spacing: -1px; }
+  .hero__title .line { display: block; overflow: hidden; }
+  .hero__glow { background: var(--neon); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 30px rgba(155,92,255,0.4)); background-size: 200% auto; animation: flow 6s linear infinite; }
+  @keyframes flow { to { background-position: 200% center; } }
+  .hero__lead { max-width: 560px; font-size: 18px; line-height: 1.65; color: var(--muted); margin-bottom: 34px; }
+  .hero__actions { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 56px; }
+  .btn { font-family: "Space Grotesk"; font-size: 15px; font-weight: 500; letter-spacing: 0.5px; padding: 15px 30px; border-radius: 44px; border: 1px solid transparent; cursor: none; position: relative; overflow: hidden; transition: transform .3s var(--ease), box-shadow .4s; color: var(--ink); }
+  .btn--primary { background: var(--neon); color: #05061a; font-weight: 700; box-shadow: 0 0 30px rgba(61,245,255,0.4); }
+  .btn--primary:hover { box-shadow: 0 0 50px rgba(155,92,255,0.7); }
+  .btn--ghost { background: var(--glass); border-color: var(--glass-brd); backdrop-filter: blur(8px); }
+  .btn--ghost:hover { border-color: var(--cyan); box-shadow: 0 0 26px rgba(61,245,255,0.4); }
+  .hero__stats { display: flex; gap: 44px; flex-wrap: wrap; }
+  .stat b { display: block; font-family: "Orbitron"; font-size: 34px; font-weight: 700; color: var(--ink); }
+  .stat span { font-size: 12px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+  .hero__scroll { position: absolute; bottom: 40px; left: clamp(20px, 6vw, 90px); display: flex; align-items: center; gap: 14px; font-size: 11px; letter-spacing: 3px; color: var(--muted); }
+  .hero__scroll i { width: 1px; height: 42px; background: linear-gradient(var(--cyan), transparent); position: relative; }
+  .hero__scroll i::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 12px; background: var(--cyan); box-shadow: 0 0 10px var(--cyan); animation: drop 2s var(--ease-io) infinite; }
+  @keyframes drop { 0% { top: 0; opacity: 1; } 80%,100% { top: 30px; opacity: 0; } }
+  .glass { background: var(--glass); border: 1px solid var(--glass-brd); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 22px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 22px; }
+  .card { position: relative; padding: 32px 28px; border-radius: 22px; background: linear-gradient(160deg, rgba(120,160,255,0.09), rgba(120,160,255,0.02)); border: 1px solid var(--glass-brd); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); overflow: hidden; transform-style: preserve-3d; transition: transform .18s var(--ease), border-color .5s, box-shadow .5s; cursor: pointer; }
+  .card:hover { border-color: rgba(61,245,255,0.5); box-shadow: 0 30px 70px -30px rgba(61,245,255,0.5); }
+  .card__glow { position: absolute; width: 260px; height: 260px; border-radius: 50%; background: radial-gradient(circle, rgba(155,92,255,0.35), transparent 65%); top: var(--my, 30%); left: var(--mx, 50%); transform: translate(-50%, -50%); opacity: 0; transition: opacity .5s; pointer-events: none; filter: blur(10px); }
+  .card:hover .card__glow { opacity: 1; }
+  .card__icon { font-size: 30px; color: var(--cyan); margin-bottom: 18px; filter: drop-shadow(0 0 14px rgba(61,245,255,0.7)); transform: translateZ(40px); }
+  .card h3 { font-size: 21px; margin-bottom: 10px; transform: translateZ(30px); }
+  .card p { color: var(--muted); font-size: 14.5px; line-height: 1.6; transform: translateZ(20px); }
+  .card__meta { display: inline-block; margin-top: 18px; font-family: "Orbitron"; font-size: 10px; letter-spacing: 3px; color: var(--violet); transform: translateZ(20px); }
+  .stream { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 40px; align-items: center; }
+  @media (max-width: 860px) { .stream { grid-template-columns: 1fr; } }
+  .stream__panel { padding: 34px; }
+  .stream__head h2 { font-size: clamp(26px, 4vw, 40px); margin-top: 12px; }
+  .stream__feed { list-style: none; margin-top: 26px; font-family: "Orbitron"; font-size: 12.5px; letter-spacing: 1px; }
+  .stream__feed li { display: flex; justify-content: space-between; gap: 16px; padding: 13px 0; border-bottom: 1px solid rgba(140,180,255,0.1); color: var(--muted); opacity: 0; transform: translateX(-12px); animation: feedIn .5s var(--ease) forwards; }
+  .stream__feed li b { color: var(--cyan); text-shadow: 0 0 10px rgba(61,245,255,0.4); }
+  .stream__feed li .ok { color: var(--amber); }
+  @keyframes feedIn { to { opacity: 1; transform: none; } }
+  .stream__viz { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+  .orb { position: relative; width: 260px; height: 260px; transform-style: preserve-3d; }
+  .orb span { position: absolute; inset: 0; border-radius: 50%; border: 1px solid rgba(61,245,255,0.4); animation: orbit 8s linear infinite; }
+  .orb span:nth-child(1) { transform: rotateX(70deg); border-color: rgba(61,245,255,0.5); }
+  .orb span:nth-child(2) { transform: rotateY(70deg); border-color: rgba(155,92,255,0.5); animation-duration: 11s; }
+  .orb span:nth-child(3) { transform: rotateX(30deg) rotateY(40deg); border-color: rgba(255,75,216,0.45); animation-duration: 14s; }
+  @keyframes orbit { to { transform: rotate(360deg); } }
+  .orb__core { position: absolute; inset: 38%; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff, var(--cyan) 35%, var(--violet) 80%); box-shadow: 0 0 60px rgba(61,245,255,0.7), 0 0 120px rgba(155,92,255,0.5); animation: bob 5s var(--ease-io) infinite; }
+  @keyframes bob { 50% { transform: scale(1.12); } }
+  .stream__caption { font-family: "Orbitron"; font-size: 11px; letter-spacing: 4px; color: var(--muted); }
+  .section--gate { align-items: center; }
+  .gate { position: relative; max-width: 640px; width: 100%; padding: 54px clamp(28px, 5vw, 56px); text-align: center; overflow: hidden; }
+  .gate__glow { position: absolute; inset: -50% -20% auto; height: 300px; background: radial-gradient(circle, rgba(155,92,255,0.3), transparent 60%); filter: blur(30px); }
+  .gate h2 { font-size: clamp(30px, 5vw, 52px); margin: 14px 0 16px; }
+  .gate p { color: var(--muted); max-width: 460px; margin: 0 auto 30px; line-height: 1.6; }
+  .gate__form { display: flex; gap: 12px; max-width: 480px; margin: 0 auto; flex-wrap: wrap; }
+  .gate__form input { flex: 1; min-width: 200px; padding: 15px 20px; border-radius: 44px; background: rgba(4,6,20,0.6); border: 1px solid var(--glass-brd); color: var(--ink); font-family: "Orbitron"; font-size: 13px; letter-spacing: 2px; outline: none; transition: border-color .3s, box-shadow .3s; }
+  .gate__form input:focus { border-color: var(--cyan); box-shadow: 0 0 24px rgba(61,245,255,0.4); }
+  .gate__form input::placeholder { color: var(--muted); }
+  .gate__status { min-height: 20px; margin-top: 18px; font-family: "Orbitron"; font-size: 12px; letter-spacing: 2px; color: var(--cyan); }
+  .footer { position: relative; z-index: 4; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 30px clamp(20px, 6vw, 90px); border-top: 1px solid var(--glass-brd); font-family: "Orbitron"; font-size: 11px; letter-spacing: 2px; color: var(--muted); background: rgba(3,4,10,0.6); backdrop-filter: blur(10px); }
+  .modal { position: fixed; inset: 0; z-index: 800; display: grid; place-items: center; padding: 24px; opacity: 0; visibility: hidden; transition: opacity .45s var(--ease), visibility .45s; }
+  .modal.is-open { opacity: 1; visibility: visible; }
+  .modal__backdrop { position: absolute; inset: 0; background: rgba(2, 3, 10, 0.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  .modal__panel { position: relative; z-index: 1; width: min(560px, 100%); padding: 44px clamp(26px, 4vw, 46px); transform: translateY(30px) scale(0.96); opacity: 0; transition: transform .5s var(--ease), opacity .5s var(--ease); box-shadow: 0 40px 120px -40px rgba(61,245,255,0.5); }
+  .modal.is-open .modal__panel { transform: none; opacity: 1; }
+  .modal__close { position: absolute; top: 18px; right: 18px; width: 38px; height: 38px; border-radius: 50%; background: var(--glass); border: 1px solid var(--glass-brd); color: var(--ink); font-size: 14px; cursor: none; transition: border-color .3s, box-shadow .3s, transform .3s; }
+  .modal__close:hover { border-color: var(--magenta); box-shadow: 0 0 22px rgba(255,75,216,0.5); transform: rotate(90deg); }
+  .modal__panel h2 { font-size: clamp(26px, 4vw, 40px); margin: 12px 0 14px; line-height: 1.05; }
+  .modal__panel > p { color: var(--muted); font-size: 16px; line-height: 1.65; }
+  .modal__specs { list-style: none; margin: 24px 0 8px; display: grid; gap: 10px; }
+  .modal__specs li { display: flex; justify-content: space-between; gap: 16px; font-family: "Orbitron"; font-size: 12px; letter-spacing: 1px; color: var(--muted); padding-bottom: 10px; border-bottom: 1px solid rgba(140,180,255,0.12); }
+  .modal__specs li b { color: var(--cyan); font-weight: 500; text-shadow: 0 0 10px rgba(61,245,255,0.4); }
+  .modal__bar { margin-top: 22px; height: 2px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+  .modal__bar i { display: block; height: 100%; width: 0%; background: var(--neon); box-shadow: 0 0 12px var(--cyan); transition: width 1.1s var(--ease); }
+  .modal__status { display: block; margin-top: 12px; font-family: "Orbitron"; font-size: 11px; letter-spacing: 3px; color: var(--violet); }
+  [data-reveal] { opacity: 0; transform: translateY(38px); transition: opacity 1s var(--ease), transform 1s var(--ease); }
+  [data-reveal].is-in { opacity: 1; transform: none; }
+  [data-reveal].is-in[style*="--i"] { transition-delay: calc(var(--i) * 0.08s); }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::after, *::before { animation: none !important; transition-duration: .001s !important; }
+    [data-reveal] { opacity: 1; transform: none; }
+    body { cursor: auto; } .aura { display: none; }
+  }
+  </style>
+</head>
+<body>
+  <div id="boot" class="boot">
+    <div class="boot__ring"></div>
+    <div class="boot__label">
+      <span class="boot__title">NOVA</span>
+      <span class="boot__sub" id="bootSub">INITIALIZING UNIVERSE</span>
+      <div class="boot__bar"><i id="bootBar"></i></div>
+    </div>
+  </div>
+
+  <canvas id="scene"></canvas>
+
+  <div class="atmosphere" aria-hidden="true">
+    <div class="atmosphere__scan"></div>
+    <div class="atmosphere__vignette"></div>
+  </div>
+
+  <div class="aura" id="aura" aria-hidden="true"></div>
+
+  <div class="hud" aria-hidden="true">
+    <span class="hud__corner hud__corner--tl"></span>
+    <span class="hud__corner hud__corner--tr"></span>
+    <span class="hud__corner hud__corner--bl"></span>
+    <span class="hud__corner hud__corner--br"></span>
+    <div class="hud__readout" id="hudReadout">SYS · ONLINE</div>
+  </div>
+
+  <header class="nav" id="nav">
+    <a class="nav__brand" href="#home" data-nav>
+      <span class="nav__logo"></span>
+      <span>NOVA<i>/</i>SYS</span>
+    </a>
+    <nav class="nav__links">
+      <a href="#home" data-nav>Origin</a>
+      <a href="#modules" data-nav>Modules</a>
+      <a href="#stream" data-nav>Data Stream</a>
+      <a href="#gate" data-nav>Access</a>
+    </nav>
+    <button class="nav__cta" data-magnetic>Enter Grid</button>
+  </header>
+
+  <main>
+    <section class="section section--hero" id="home">
+      <div class="hero" data-parallax>
+        <div class="hero__tag" data-reveal>
+          <span class="dot"></span> TRANSMISSION 2149 · SECTOR VOID-7
+        </div>
+        <h1 class="hero__title" data-reveal>
+          <span class="line">ENTER THE</span>
+          <span class="line hero__glow">HOLOGRAPHIC</span>
+          <span class="line">UNIVERSE</span>
+        </h1>
+        <p class="hero__lead" data-reveal>
+          A surreal, cinematic interface woven from light. Fluid particle fields,
+          floating holographic panels and abstract 3D space — an experimental
+          digital reality built to feel unreal.
+        </p>
+        <div class="hero__actions" data-reveal>
+          <button class="btn btn--primary" data-magnetic data-goto="#modules">Launch Experience</button>
+          <button class="btn btn--ghost" data-magnetic data-goto="#stream">Explore Data</button>
+        </div>
+        <div class="hero__stats" data-reveal>
+          <div class="stat"><b data-count="9482">0</b><span>Nodes Online</span></div>
+          <div class="stat"><b data-count="128">0</b><span>Light Sectors</span></div>
+          <div class="stat"><b data-count="99">0</b><span>% Coherence</span></div>
+        </div>
+      </div>
+      <div class="hero__scroll" data-reveal>
+        <span>SCROLL TO DRIFT</span>
+        <i></i>
+      </div>
+    </section>
+
+    <section class="section section--modules" id="modules">
+      <div class="section__head" data-reveal>
+        <span class="eyebrow">// SYSTEM MODULES</span>
+        <h2>Floating holographic interfaces</h2>
+        <p>Layered glass panels drift in depth, reacting to your presence in real time. Click a module to expand it.</p>
+      </div>
+
+      <div class="cards" id="cards">
+        <article class="card" data-tilt data-reveal style="--i:0">
+          <div class="card__glow"></div>
+          <div class="card__icon">◈</div>
+          <h3>Fluid Particle Core</h3>
+          <p>A living field of 20k light points advected by simplex-noise flow, rendered on the GPU.</p>
+          <span class="card__meta">WEBGL · POINTS</span>
+        </article>
+        <article class="card" data-tilt data-reveal style="--i:1">
+          <div class="card__glow"></div>
+          <div class="card__icon">❖</div>
+          <h3>Abstract 3D Space</h3>
+          <p>Wireframe geometry and volumetric depth create an endless, camera-driven environment.</p>
+          <span class="card__meta">THREE.JS · SCENE</span>
+        </article>
+        <article class="card" data-tilt data-reveal style="--i:2">
+          <div class="card__glow"></div>
+          <div class="card__icon">◉</div>
+          <h3>Glassmorphic UI</h3>
+          <p>Frosted, refractive panels layer over the void with parallax and pointer-reactive tilt.</p>
+          <span class="card__meta">DEPTH · MOTION</span>
+        </article>
+        <article class="card" data-tilt data-reveal style="--i:3">
+          <div class="card__glow"></div>
+          <div class="card__icon">⬡</div>
+          <h3>Cinematic Transitions</h3>
+          <p>Smooth camera-like easing warps the universe between states for a filmic flow.</p>
+          <span class="card__meta">EASING · CAMERA</span>
+        </article>
+      </div>
+    </section>
+
+    <section class="section section--stream" id="stream">
+      <div class="stream">
+        <div class="stream__panel glass" data-tilt data-reveal>
+          <div class="stream__head">
+            <span class="eyebrow">// LIVE DATA STREAM</span>
+            <h2>Signals from the void</h2>
+          </div>
+          <ul class="stream__feed" id="feed"></ul>
+        </div>
+        <div class="stream__viz" data-reveal>
+          <div class="orb" data-parallax-deep>
+            <span></span><span></span><span></span>
+            <div class="orb__core"></div>
+          </div>
+          <div class="stream__caption">HOLO-CORE · ROTATIONAL SYNC</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--gate" id="gate">
+      <div class="gate glass" data-reveal data-tilt>
+        <div class="gate__glow"></div>
+        <span class="eyebrow">// ACCESS TERMINAL</span>
+        <h2>Step through the grid</h2>
+        <p>The universe is procedural, GPU-driven and infinite. Cross the threshold and it responds to you.</p>
+        <div class="gate__form">
+          <input type="text" placeholder="ENTER CALLSIGN" id="callsign" aria-label="callsign" />
+          <button class="btn btn--primary" data-magnetic id="gateBtn">Authorize</button>
+        </div>
+        <p class="gate__status" id="gateStatus"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>NOVA/SYS · A speculative interface experiment</span>
+    <span>BUILT WITH WEBGL · THREE.JS</span>
+  </footer>
+
+  <div class="modal" id="modal" aria-hidden="true">
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__panel glass" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal__close" data-close aria-label="Close">✕</button>
+      <span class="eyebrow" id="modalMeta">// MODULE</span>
+      <h2 id="modalTitle">Module</h2>
+      <p id="modalBody">…</p>
+      <ul class="modal__specs" id="modalSpecs"></ul>
+      <div class="modal__bar"><i id="modalBar"></i></div>
+      <span class="modal__status" id="modalStatus">MODULE ONLINE</span>
+    </div>
+  </div>
+
+  <!-- Three.js UMD (classic script → works on file:// double-click) -->
+  <script src="https://unpkg.com/three@0.136.0/build/three.min.js"></script>
+  <script>
+  /* =====================================================================
+     NOVA/SYS — inlined app (classic script; relies on global THREE)
+     ===================================================================== */
+  (function () {
+    "use strict";
+    var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var isTouch = window.matchMedia("(pointer: coarse)").matches;
+
+    function makeSprite() {
+      var c = document.createElement("canvas");
+      c.width = c.height = 64;
+      var ctx = c.getContext("2d");
+      var g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+      g.addColorStop(0, "rgba(255,255,255,1)");
+      g.addColorStop(0.25, "rgba(255,255,255,0.85)");
+      g.addColorStop(0.6, "rgba(255,255,255,0.15)");
+      g.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = g; ctx.fillRect(0, 0, 64, 64);
+      return c;
+    }
+
+    function initUniverse() {
+      var canvas = document.getElementById("scene");
+      var renderer;
+      try {
+        if (typeof THREE === "undefined") throw new Error("three missing");
+        renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
+      } catch (e) {
+        document.body.classList.add("no-webgl");
+        return { onPointer: function () {}, warp: function () {} };
+      }
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      var scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x03040a, 0.055);
+      var camera = new THREE.PerspectiveCamera(62, window.innerWidth / window.innerHeight, 0.1, 100);
+      camera.position.set(0, 0, 16);
+
+      var COUNT = isTouch ? 6000 : 20000;
+      var positions = new Float32Array(COUNT * 3);
+      var seeds = new Float32Array(COUNT);
+      var colors = new Float32Array(COUNT * 3);
+      var palette = [new THREE.Color(0x3df5ff), new THREE.Color(0x9b5cff), new THREE.Color(0xff4bd8)];
+      for (var i = 0; i < COUNT; i++) {
+        var r = Math.pow(Math.random(), 0.5) * 26;
+        var theta = Math.random() * Math.PI * 2;
+        positions[i * 3] = Math.cos(theta) * r;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 30;
+        positions[i * 3 + 2] = Math.sin(theta) * r - 6;
+        seeds[i] = Math.random() * Math.PI * 2;
+        var c = palette[Math.floor(Math.random() * palette.length)];
+        colors[i * 3] = c.r; colors[i * 3 + 1] = c.g; colors[i * 3 + 2] = c.b;
+      }
+      var geo = new THREE.BufferGeometry();
+      geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+      geo.setAttribute("aColor", new THREE.BufferAttribute(colors, 3));
+      geo.setAttribute("aSeed", new THREE.BufferAttribute(seeds, 1));
+
+      var tex = new THREE.CanvasTexture(makeSprite());
+      var uniforms = { uTime: { value: 0 }, uTex: { value: tex }, uSize: { value: isTouch ? 46 : 62 }, uWarp: { value: 0 } };
+      var mat = new THREE.ShaderMaterial({
+        uniforms: uniforms, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+        vertexShader: [
+          "uniform float uTime; uniform float uSize; uniform float uWarp;",
+          "attribute vec3 aColor; attribute float aSeed;",
+          "varying vec3 vColor; varying float vAlpha;",
+          "void main() {",
+          "  vColor = aColor; vec3 p = position;",
+          "  float t = uTime * 0.35 + aSeed;",
+          "  p.x += sin(t + p.y * 0.15) * (1.2 + uWarp * 3.0);",
+          "  p.y += cos(t * 0.8 + p.z * 0.12) * (1.0 + uWarp * 2.5);",
+          "  p.z += sin(t * 0.6 + p.x * 0.1) * (1.2 + uWarp * 3.0);",
+          "  vec4 mv = modelViewMatrix * vec4(p, 1.0);",
+          "  gl_Position = projectionMatrix * mv;",
+          "  gl_PointSize = uSize * (1.0 + uWarp) / -mv.z;",
+          "  vAlpha = smoothstep(60.0, 4.0, -mv.z);",
+          "}"
+        ].join("\n"),
+        fragmentShader: [
+          "uniform sampler2D uTex; varying vec3 vColor; varying float vAlpha;",
+          "void main() {",
+          "  vec4 t = texture2D(uTex, gl_PointCoord);",
+          "  gl_FragColor = vec4(vColor, t.a * vAlpha);",
+          "}"
+        ].join("\n")
+      });
+      var points = new THREE.Points(geo, mat);
+      scene.add(points);
+
+      var shapes = [];
+      var shapeGeos = [new THREE.IcosahedronGeometry(3.2, 1), new THREE.TorusGeometry(2.6, 0.5, 12, 40), new THREE.OctahedronGeometry(2.4, 0)];
+      shapeGeos.forEach(function (g, idx) {
+        var wire = new THREE.WireframeGeometry(g);
+        var line = new THREE.LineSegments(wire, new THREE.LineBasicMaterial({ color: palette[idx].getHex(), transparent: true, opacity: 0.28 }));
+        line.position.set((idx - 1) * 12, (idx % 2 === 0 ? 4 : -5), -14 - idx * 4);
+        scene.add(line); shapes.push(line);
+      });
+
+      var pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+      var scrollTarget = 0, scrollPos = 0, warpTarget = 0;
+      var clock = new THREE.Clock();
+      function frame() {
+        var dt = clock.getDelta();
+        var t = clock.elapsedTime;
+        uniforms.uTime.value = t;
+        pointer.x += (pointer.tx - pointer.x) * 0.05;
+        pointer.y += (pointer.ty - pointer.y) * 0.05;
+        scrollPos += (scrollTarget - scrollPos) * 0.06;
+        uniforms.uWarp.value += (warpTarget - uniforms.uWarp.value) * 0.08;
+        warpTarget *= 0.9;
+        camera.position.x += (pointer.x * 4 - camera.position.x) * 0.04;
+        camera.position.y += (-pointer.y * 3 - scrollPos * 10 - camera.position.y) * 0.04;
+        camera.lookAt(0, -scrollPos * 4, 0);
+        points.rotation.y = t * 0.02;
+        shapes.forEach(function (s, idx) { s.rotation.x += dt * (0.1 + idx * 0.04); s.rotation.y += dt * (0.14 + idx * 0.03); });
+        renderer.render(scene, camera);
+        requestAnimationFrame(frame);
+      }
+      if (!reduceMotion) frame(); else renderer.render(scene, camera);
+
+      window.addEventListener("resize", function () {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+      window.addEventListener("scroll", function () {
+        var max = document.body.scrollHeight - window.innerHeight;
+        scrollTarget = max > 0 ? window.scrollY / max : 0;
+      }, { passive: true });
+
+      return {
+        onPointer: function (nx, ny) { pointer.tx = nx; pointer.ty = ny; },
+        warp: function () { warpTarget = 1; }
+      };
+    }
+
+    var universe = initUniverse();
+
+    function runBoot() {
+      var boot = document.getElementById("boot");
+      var bar = document.getElementById("bootBar");
+      var sub = document.getElementById("bootSub");
+      var stages = ["INITIALIZING UNIVERSE", "COMPILING SHADERS", "SEEDING PARTICLE FIELD", "SYNCING HOLO-CORE", "READY"];
+      var p = 0, si = 0;
+      var tick = setInterval(function () {
+        p = Math.min(100, p + Math.random() * 16 + 6);
+        if (bar) bar.style.width = p + "%";
+        var stage = Math.min(stages.length - 1, Math.floor((p / 100) * stages.length));
+        if (stage !== si) { si = stage; if (sub) sub.textContent = stages[si]; }
+        if (p >= 100) { clearInterval(tick); setTimeout(function () { boot.classList.add("is-done"); startReveals(); }, 400); }
+      }, 220);
+    }
+
+    function startReveals() {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); } });
+      }, { threshold: 0.15 });
+      document.querySelectorAll("[data-reveal]").forEach(function (el) { io.observe(el); });
+      document.querySelectorAll("[data-count]").forEach(function (el) {
+        var target = +el.dataset.count;
+        var st = new IntersectionObserver(function (ents) { if (ents[0].isIntersecting) { countUp(el, target); st.disconnect(); } }, { threshold: 0.5 });
+        st.observe(el);
+      });
+    }
+
+    function countUp(el, target) {
+      var dur = 1600, start = performance.now();
+      function step(now) {
+        var k = Math.min(1, (now - start) / dur);
+        var eased = 1 - Math.pow(1 - k, 3);
+        el.textContent = Math.floor(eased * target).toLocaleString();
+        if (k < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    function initPointer() {
+      if (isTouch || reduceMotion) return;
+      var aura = document.getElementById("aura");
+      window.addEventListener("mousemove", function (e) {
+        aura.style.left = e.clientX + "px";
+        aura.style.top = e.clientY + "px";
+        universe.onPointer((e.clientX / window.innerWidth) * 2 - 1, (e.clientY / window.innerHeight) * 2 - 1);
+      });
+      document.querySelectorAll("a, button, input, [data-tilt]").forEach(function (el) {
+        el.addEventListener("mouseenter", function () { aura.classList.add("is-active"); });
+        el.addEventListener("mouseleave", function () { aura.classList.remove("is-active"); });
+      });
+    }
+
+    function initMagnetic() {
+      if (isTouch || reduceMotion) return;
+      document.querySelectorAll("[data-magnetic]").forEach(function (el) {
+        el.addEventListener("mousemove", function (e) {
+          var r = el.getBoundingClientRect();
+          var mx = e.clientX - r.left - r.width / 2;
+          var my = e.clientY - r.top - r.height / 2;
+          el.style.transform = "translate(" + mx * 0.3 + "px, " + my * 0.4 + "px)";
+        });
+        el.addEventListener("mouseleave", function () { el.style.transform = ""; });
+      });
+    }
+
+    function initTilt() {
+      if (isTouch || reduceMotion) return;
+      document.querySelectorAll("[data-tilt]").forEach(function (el) {
+        el.addEventListener("mousemove", function (e) {
+          var r = el.getBoundingClientRect();
+          var px = (e.clientX - r.left) / r.width;
+          var py = (e.clientY - r.top) / r.height;
+          el.style.transform = "perspective(900px) rotateY(" + (px - 0.5) * 12 + "deg) rotateX(" + (0.5 - py) * 12 + "deg) translateZ(6px)";
+          el.style.setProperty("--mx", px * 100 + "%");
+          el.style.setProperty("--my", py * 100 + "%");
+        });
+        el.addEventListener("mouseleave", function () { el.style.transform = ""; });
+      });
+    }
+
+    function initNav() {
+      var nav = document.getElementById("nav");
+      var last = 0;
+      window.addEventListener("scroll", function () {
+        var y = window.scrollY;
+        nav.classList.toggle("is-scrolled", y > 40);
+        nav.classList.toggle("is-hidden", y > last && y > 300);
+        last = y;
+      }, { passive: true });
+    }
+
+    function initTransitions() {
+      document.querySelectorAll("[data-nav], [data-goto]").forEach(function (el) {
+        el.addEventListener("click", function (e) {
+          var sel = el.getAttribute("href") || el.dataset.goto;
+          if (!sel || sel.charAt(0) !== "#") return;
+          var target = document.querySelector(sel);
+          if (!target) return;
+          e.preventDefault();
+          universe.warp();
+          target.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
+        });
+      });
+    }
+
+    function initHUD() {
+      var readout = document.getElementById("hudReadout");
+      var words = ["SYS · ONLINE", "FLUX · STABLE", "CORE · SYNCED", "GRID · NOMINAL", "LINK · SECURE"];
+      var i = 0;
+      setInterval(function () { i = (i + 1) % words.length; readout.textContent = words[i]; }, 2600);
+    }
+
+    function initFeed() {
+      var feed = document.getElementById("feed");
+      if (!feed) return;
+      var labels = ["NEUTRINO BURST", "GRAVITON ECHO", "QUANTUM DRIFT", "PLASMA SURGE", "DARK FLUX", "PHOTON CASCADE", "ION STORM", "NEBULA PING"];
+      var sectors = ["V-7", "K-2", "X-19", "Z-04", "N-88", "R-31"];
+      function line() {
+        var li = document.createElement("li");
+        var val = (Math.random() * 900 + 100).toFixed(2);
+        var ok = Math.random() > 0.35;
+        li.innerHTML = "<span>" + labels[(Math.random() * labels.length) | 0] + " · " + sectors[(Math.random() * sectors.length) | 0] + "</span>" +
+                       "<b class=\"" + (ok ? "" : "ok") + "\">" + val + " " + (ok ? "Hz" : "⚠") + "</b>";
+        feed.prepend(li);
+        while (feed.children.length > 7) feed.removeChild(feed.lastChild);
+      }
+      for (var k = 0; k < 7; k++) line();
+      setInterval(line, 1800);
+    }
+
+    function initGate() {
+      var btn = document.getElementById("gateBtn");
+      var input = document.getElementById("callsign");
+      var status = document.getElementById("gateStatus");
+      if (!btn) return;
+      function authorize() {
+        var name = (input.value || "TRAVELLER").trim().toUpperCase().slice(0, 18);
+        universe.warp();
+        var steps = ["VERIFYING CALLSIGN...", "OPENING GRID...", "ACCESS GRANTED"];
+        var s = 0;
+        status.style.color = "var(--cyan)";
+        var iv = setInterval(function () {
+          status.textContent = steps[s];
+          if (s === steps.length - 1) { clearInterval(iv); status.innerHTML = "WELCOME, " + name + " — THE UNIVERSE IS YOURS"; }
+          s++;
+        }, 700);
+      }
+      btn.addEventListener("click", authorize);
+      input.addEventListener("keydown", function (e) { if (e.key === "Enter") authorize(); });
+    }
+
+    var MODULE_DETAIL = {
+      "Fluid Particle Core": { body: "A living field of 20,000 GPU-resident light points, each advected every frame by a layered flow field inside a custom GLSL vertex shader. No two frames are identical — the cloud breathes.", specs: [["Points", "20,480"], ["Pipeline", "GLSL / Vertex"], ["Blending", "Additive"], ["Cost", "~1 draw call"]] },
+      "Abstract 3D Space": { body: "Wireframe primitives drift through volumetric depth with exponential fog, driven by a slow, camera-like easing. Move your pointer and the whole environment parallaxes around you.", specs: [["Geometry", "Ico · Torus · Octa"], ["Camera", "62° · drifting"], ["Fog", "ExpFog 0.055"], ["Parallax", "Pointer-linked"]] },
+      "Glassmorphic UI": { body: "Frosted, refractive panels layer over the void. Each reacts to your cursor with real-time 3D tilt and a glow that tracks the pointer — depth you can feel, not just see.", specs: [["Blur", "16px backdrop"], ["Tilt", "±12° live"], ["Layers", "translateZ depth"], ["Glow", "Pointer-tracked"]] },
+      "Cinematic Transitions": { body: "Every navigation and action fires a warp pulse through the particle field, easing the universe between states for a filmic, movie-intro flow rather than a hard cut.", specs: [["Easing", "cubic-bezier"], ["Warp", "Shader uniform"], ["Trigger", "Nav · Cards · Gate"], ["Feel", "Camera-like"]] }
+    };
+
+    function initCards() {
+      var modal = document.getElementById("modal");
+      if (!modal) return;
+      var elTitle = document.getElementById("modalTitle");
+      var elMeta = document.getElementById("modalMeta");
+      var elBody = document.getElementById("modalBody");
+      var elSpecs = document.getElementById("modalSpecs");
+      var elBar = document.getElementById("modalBar");
+      var elStatus = document.getElementById("modalStatus");
+      var lastFocus = null;
+      function open(card) {
+        var titleEl = card.querySelector("h3");
+        var metaEl = card.querySelector(".card__meta");
+        var title = titleEl ? titleEl.textContent.trim() : "Module";
+        var meta = metaEl ? metaEl.textContent.trim() : "MODULE";
+        var pEl = card.querySelector("p");
+        var data = MODULE_DETAIL[title] || { body: pEl ? pEl.textContent : "", specs: [] };
+        elTitle.textContent = title;
+        elMeta.textContent = "// " + meta;
+        elBody.textContent = data.body;
+        elSpecs.innerHTML = data.specs.map(function (s) { return "<li><span>" + s[0] + "</span><b>" + s[1] + "</b></li>"; }).join("");
+        elStatus.textContent = "MODULE ONLINE · " + meta;
+        elBar.style.width = "0%";
+        lastFocus = card;
+        universe.warp();
+        modal.classList.add("is-open");
+        modal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+        requestAnimationFrame(function () { requestAnimationFrame(function () { elBar.style.width = "100%"; }); });
+        var closeBtn = modal.querySelector(".modal__close");
+        if (closeBtn) closeBtn.focus();
+      }
+      function close() {
+        modal.classList.remove("is-open");
+        modal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+        universe.warp();
+        if (lastFocus && lastFocus.focus) lastFocus.focus();
+      }
+      document.querySelectorAll(".card").forEach(function (card) {
+        card.setAttribute("tabindex", "0");
+        card.setAttribute("role", "button");
+        card.addEventListener("click", function () { open(card); });
+        card.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(card); } });
+      });
+      modal.querySelectorAll("[data-close]").forEach(function (el) { el.addEventListener("click", close); });
+      document.addEventListener("keydown", function (e) { if (e.key === "Escape" && modal.classList.contains("is-open")) close(); });
+    }
+
+    runBoot();
+    initPointer();
+    initMagnetic();
+    initTilt();
+    initNav();
+    initTransitions();
+    initHUD();
+    initFeed();
+    initGate();
+    initCards();
+    setTimeout(function () { if (!document.querySelector("[data-reveal].is-in")) startReveals(); }, 6000);
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="An immersive sci-fi digital universe — holographic interfaces, cinematic particle simulations and abstract 3D environments." />
+  <title>NOVA — A Next-Gen Digital Universe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- ===== Boot / preloader ===== -->
+  <div id="boot" class="boot">
+    <div class="boot__ring"></div>
+    <div class="boot__label">
+      <span class="boot__title">NOVA</span>
+      <span class="boot__sub" id="bootSub">INITIALIZING UNIVERSE</span>
+      <div class="boot__bar"><i id="bootBar"></i></div>
+    </div>
+  </div>
+
+  <!-- ===== WebGL canvas (Three.js particle universe) ===== -->
+  <canvas id="scene"></canvas>
+
+  <!-- ===== Grain + scanline atmosphere ===== -->
+  <div class="atmosphere" aria-hidden="true">
+    <div class="atmosphere__scan"></div>
+    <div class="atmosphere__vignette"></div>
+  </div>
+
+  <!-- ===== Cursor aura ===== -->
+  <div class="aura" id="aura" aria-hidden="true"></div>
+
+  <!-- ===== HUD frame ===== -->
+  <div class="hud" aria-hidden="true">
+    <span class="hud__corner hud__corner--tl"></span>
+    <span class="hud__corner hud__corner--tr"></span>
+    <span class="hud__corner hud__corner--bl"></span>
+    <span class="hud__corner hud__corner--br"></span>
+    <div class="hud__readout" id="hudReadout">SYS · ONLINE</div>
+  </div>
+
+  <!-- ===== Nav ===== -->
+  <header class="nav" id="nav">
+    <a class="nav__brand" href="#home" data-nav>
+      <span class="nav__logo"></span>
+      <span>NOVA<i>/</i>SYS</span>
+    </a>
+    <nav class="nav__links">
+      <a href="#home" data-nav>Origin</a>
+      <a href="#modules" data-nav>Modules</a>
+      <a href="#stream" data-nav>Data Stream</a>
+      <a href="#gate" data-nav>Access</a>
+    </nav>
+    <button class="nav__cta" data-magnetic>Enter Grid</button>
+  </header>
+
+  <main>
+    <!-- ===== HERO ===== -->
+    <section class="section section--hero" id="home">
+      <div class="hero" data-parallax>
+        <div class="hero__tag" data-reveal>
+          <span class="dot"></span> TRANSMISSION 2149 · SECTOR VOID-7
+        </div>
+        <h1 class="hero__title" data-reveal>
+          <span class="line" data-split>ENTER THE</span>
+          <span class="line hero__glow" data-split>HOLOGRAPHIC</span>
+          <span class="line" data-split>UNIVERSE</span>
+        </h1>
+        <p class="hero__lead" data-reveal>
+          A surreal, cinematic interface woven from light. Fluid particle fields,
+          floating holographic panels and abstract 3D space — an experimental
+          digital reality built to feel unreal.
+        </p>
+        <div class="hero__actions" data-reveal>
+          <button class="btn btn--primary" data-magnetic data-goto="#modules">Launch Experience</button>
+          <button class="btn btn--ghost" data-magnetic data-goto="#stream">Explore Data</button>
+        </div>
+        <div class="hero__stats" data-reveal>
+          <div class="stat"><b data-count="9482">0</b><span>Nodes Online</span></div>
+          <div class="stat"><b data-count="128">0</b><span>Light Sectors</span></div>
+          <div class="stat"><b data-count="99">0</b><span>% Coherence</span></div>
+        </div>
+      </div>
+      <div class="hero__scroll" data-reveal>
+        <span>SCROLL TO DRIFT</span>
+        <i></i>
+      </div>
+    </section>
+
+    <!-- ===== MODULES / floating glass cards ===== -->
+    <section class="section section--modules" id="modules">
+      <div class="section__head" data-reveal>
+        <span class="eyebrow">// SYSTEM MODULES</span>
+        <h2>Floating holographic interfaces</h2>
+        <p>Layered glass panels drift in depth, reacting to your presence in real time.</p>
+      </div>
+
+      <div class="cards" id="cards">
+        <article class="card" data-tilt data-reveal style="--i:0">
+          <div class="card__glow"></div>
+          <div class="card__icon">◈</div>
+          <h3>Fluid Particle Core</h3>
+          <p>A living field of 20k light points advected by simplex-noise flow, rendered on the GPU.</p>
+          <span class="card__meta">WEBGL · POINTS</span>
+        </article>
+        <article class="card" data-tilt data-reveal style="--i:1">
+          <div class="card__glow"></div>
+          <div class="card__icon">❖</div>
+          <h3>Abstract 3D Space</h3>
+          <p>Wireframe geometry and volumetric depth create an endless, camera-driven environment.</p>
+          <span class="card__meta">THREE.JS · SCENE</span>
+        </article>
+        <article class="card" data-tilt data-reveal style="--i:2">
+          <div class="card__glow"></div>
+          <div class="card__icon">◉</div>
+          <h3>Glassmorphic UI</h3>
+          <p>Frosted, refractive panels layer over the void with parallax and pointer-reactive tilt.</p>
+          <span class="card__meta">DEPTH · MOTION</span>
+        </article>
+        <article class="card" data-tilt data-reveal style="--i:3">
+          <div class="card__glow"></div>
+          <div class="card__icon">⬡</div>
+          <h3>Cinematic Transitions</h3>
+          <p>Smooth camera-like easing warps the universe between states for a filmic flow.</p>
+          <span class="card__meta">EASING · CAMERA</span>
+        </article>
+      </div>
+    </section>
+
+    <!-- ===== DATA STREAM ===== -->
+    <section class="section section--stream" id="stream">
+      <div class="stream">
+        <div class="stream__panel glass" data-tilt data-reveal>
+          <div class="stream__head">
+            <span class="eyebrow">// LIVE DATA STREAM</span>
+            <h2>Signals from the void</h2>
+          </div>
+          <ul class="stream__feed" id="feed"></ul>
+        </div>
+        <div class="stream__viz" data-reveal>
+          <div class="orb" data-parallax-deep>
+            <span></span><span></span><span></span>
+            <div class="orb__core"></div>
+          </div>
+          <div class="stream__caption">HOLO-CORE · ROTATIONAL SYNC</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ACCESS GATE ===== -->
+    <section class="section section--gate" id="gate">
+      <div class="gate glass" data-reveal data-tilt>
+        <div class="gate__glow"></div>
+        <span class="eyebrow">// ACCESS TERMINAL</span>
+        <h2>Step through the grid</h2>
+        <p>The universe is procedural, GPU-driven and infinite. Cross the threshold and it responds to you.</p>
+        <div class="gate__form">
+          <input type="text" placeholder="ENTER CALLSIGN" id="callsign" aria-label="callsign" />
+          <button class="btn btn--primary" data-magnetic id="gateBtn">Authorize</button>
+        </div>
+        <p class="gate__status" id="gateStatus"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>NOVA/SYS · A speculative interface experiment</span>
+    <span>BUILT WITH WEBGL · THREE.JS</span>
+  </footer>
+
+  <!-- ===== Module detail overlay ===== -->
+  <div class="modal" id="modal" aria-hidden="true">
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__panel glass" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal__close" data-close aria-label="Close">✕</button>
+      <span class="eyebrow" id="modalMeta">// MODULE</span>
+      <h2 id="modalTitle">Module</h2>
+      <p id="modalBody">…</p>
+      <ul class="modal__specs" id="modalSpecs"></ul>
+      <div class="modal__bar"><i id="modalBar"></i></div>
+      <span class="modal__status" id="modalStatus">MODULE ONLINE</span>
+    </div>
+  </div>
+
+  <!-- Watchdog: if the ES module fails to load (e.g. no CDN), still boot -->
+  <script>
+    (function () {
+      var loaded = false;
+      window.addEventListener("nova:ready", function () { loaded = true; });
+      setTimeout(function () {
+        if (loaded) return;
+        document.body.classList.add("no-webgl");
+        var boot = document.getElementById("boot");
+        if (boot) boot.classList.add("is-done");
+        document.querySelectorAll("[data-reveal]").forEach(function (el) { el.classList.add("is-in"); });
+        var feed = document.getElementById("feed");
+        if (feed && !feed.children.length) {
+          for (var i = 0; i < 5; i++) {
+            var li = document.createElement("li");
+            li.innerHTML = "<span>SIGNAL LOCKED</span><b>—</b>";
+            feed.appendChild(li);
+          }
+        }
+      }, 3500);
+    })();
+  </script>
+
+  <!-- Three.js (ES module via CDN, with graceful degradation) -->
+  <script type="module" src="app.js"></script>
+</body>
+</html>
