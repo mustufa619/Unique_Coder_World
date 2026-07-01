@@ -366,6 +366,75 @@ function initGate() {
   input.addEventListener("keydown", (e) => { if (e.key === "Enter") authorize(); });
 }
 
+// ---- Module cards → holographic detail overlay -----------------------
+const MODULE_DETAIL = {
+  "Fluid Particle Core": {
+    body: "A living field of 20,000 GPU-resident light points, each advected every frame by a layered flow field inside a custom GLSL vertex shader. No two frames are identical — the cloud breathes.",
+    specs: [["Points", "20,480"], ["Pipeline", "GLSL / Vertex"], ["Blending", "Additive"], ["Cost", "~1 draw call"]],
+  },
+  "Abstract 3D Space": {
+    body: "Wireframe primitives drift through volumetric depth with exponential fog, driven by a slow, camera-like easing. Move your pointer and the whole environment parallaxes around you.",
+    specs: [["Geometry", "Ico · Torus · Octa"], ["Camera", "62° · drifting"], ["Fog", "ExpFog 0.055"], ["Parallax", "Pointer-linked"]],
+  },
+  "Glassmorphic UI": {
+    body: "Frosted, refractive panels layer over the void. Each reacts to your cursor with real-time 3D tilt and a glow that tracks the pointer — depth you can feel, not just see.",
+    specs: [["Blur", "16px backdrop"], ["Tilt", "±12° live"], ["Layers", "translateZ depth"], ["Glow", "Pointer-tracked"]],
+  },
+  "Cinematic Transitions": {
+    body: "Every navigation and action fires a warp pulse through the particle field, easing the universe between states for a filmic, movie-intro flow rather than a hard cut.",
+    specs: [["Easing", "cubic-bezier"], ["Warp", "Shader uniform"], ["Trigger", "Nav · Cards · Gate"], ["Feel", "Camera-like"]],
+  },
+};
+
+function initCards() {
+  const modal = document.getElementById("modal");
+  if (!modal) return;
+  const elTitle = document.getElementById("modalTitle");
+  const elMeta = document.getElementById("modalMeta");
+  const elBody = document.getElementById("modalBody");
+  const elSpecs = document.getElementById("modalSpecs");
+  const elBar = document.getElementById("modalBar");
+  const elStatus = document.getElementById("modalStatus");
+  let lastFocus = null;
+
+  function open(card) {
+    const title = card.querySelector("h3")?.textContent.trim() || "Module";
+    const meta = card.querySelector(".card__meta")?.textContent.trim() || "// MODULE";
+    const data = MODULE_DETAIL[title] || { body: card.querySelector("p")?.textContent || "", specs: [] };
+    elTitle.textContent = title;
+    elMeta.textContent = "// " + meta;
+    elBody.textContent = data.body;
+    elSpecs.innerHTML = data.specs.map((s) => `<li><span>${s[0]}</span><b>${s[1]}</b></li>`).join("");
+    elStatus.textContent = "MODULE ONLINE · " + meta;
+    elBar.style.width = "0%";
+    lastFocus = card;
+    universe.warp();
+    modal.classList.add("is-open");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+    requestAnimationFrame(() => requestAnimationFrame(() => { elBar.style.width = "100%"; }));
+    modal.querySelector(".modal__close")?.focus();
+  }
+  function close() {
+    modal.classList.remove("is-open");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+    universe.warp();
+    if (lastFocus) lastFocus.focus?.();
+  }
+
+  document.querySelectorAll(".card").forEach((card) => {
+    card.setAttribute("tabindex", "0");
+    card.setAttribute("role", "button");
+    card.addEventListener("click", () => open(card));
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(card); }
+    });
+  });
+  modal.querySelectorAll("[data-close]").forEach((el) => el.addEventListener("click", close));
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && modal.classList.contains("is-open")) close(); });
+}
+
 /* ---------------------------------------------------------------------
    BOOTSTRAP
 --------------------------------------------------------------------- */
@@ -381,6 +450,7 @@ function boot() {
   initHUD();
   initFeed();
   initGate();
+  initCards();
   // safety: if boot module errors, still reveal after a moment
   setTimeout(() => {
     if (!document.querySelector("[data-reveal].is-in")) startReveals();

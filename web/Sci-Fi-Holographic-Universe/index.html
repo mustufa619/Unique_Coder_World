@@ -171,6 +171,20 @@
     <span>BUILT WITH WEBGL · THREE.JS</span>
   </footer>
 
+  <!-- ===== Module detail overlay ===== -->
+  <div class="modal" id="modal" aria-hidden="true">
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__panel glass" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal__close" data-close aria-label="Close">✕</button>
+      <span class="eyebrow" id="modalMeta">// MODULE</span>
+      <h2 id="modalTitle">Module</h2>
+      <p id="modalBody">…</p>
+      <ul class="modal__specs" id="modalSpecs"></ul>
+      <div class="modal__bar"><i id="modalBar"></i></div>
+      <span class="modal__status" id="modalStatus">MODULE ONLINE</span>
+    </div>
+  </div>
+
   <!-- Watchdog: if the ES module fails to load (e.g. no CDN), still boot -->
   <script>
     (function () {
